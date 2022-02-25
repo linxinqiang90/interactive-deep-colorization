@@ -1,8 +1,28 @@
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+import numpy as np
+from data import lab_gamut
+import pdb
+
+try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
+
+try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
 
 
 class GUI_VIS(QWidget):
+
+    update_color = pyqtSignal(QString)
+
+
     def __init__(self, win_size=256, scale=2.0):
         QWidget.__init__(self)
         self.result = None
@@ -49,12 +69,26 @@ class GUI_VIS(QWidget):
         y = int(pnt.y() / self.scale)
         return x, y
 
+    def calibrate_color(self, c, pos):
+        x, y = self.scale_point(pos)
+
+        # snap color based on L color
+        color_array = np.array((c.red(), c.green(), c.blue())).astype(
+            'uint8')
+        mean_L = self.im_l[y, x]
+        snap_color = lab_gamut.snap_ab(mean_L, color_array)
+        snap_qcolor = QColor(snap_color[0], snap_color[1], snap_color[2])
+        return snap_qcolor
+
     def mousePressEvent(self, event):
         pos = event.pos()
         x, y = self.scale_point(pos)
         if event.button() == Qt.LeftButton and self.is_valid_point(pos):  # click the point
             if self.result is not None:
                 color = self.result[y, x, :]  #
+                c = QColor(color[0], color[1], color[2])
+                # color = self.calibrate_color(c, self.pos)
+                self.update_color.emit(QString('background-color: %s' % c.name()))
                 print('color', color)
 
     def mouseMoveEvent(self, event):

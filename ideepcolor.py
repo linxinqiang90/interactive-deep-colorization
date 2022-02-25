@@ -1,9 +1,10 @@
 from __future__ import print_function
 import sys
+from PyQt5.QtWidgets import *
 import argparse
-import qdarkstyle
-from PyQt4.QtGui import QApplication, QIcon
-from PyQt4.QtCore import Qt
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt
 from ui import gui_design
 from data import colorize_image as CI
 
@@ -36,7 +37,7 @@ def parse_args():
     parser.add_argument('--dist_model', dest='color_model', help='colorization distribution prediction model', type=str,
                         default='./models/pytorch/caffemodel.pth')
 
-    parser.add_argument('--backend', dest='backend', type=str, help='caffe or pytorch', default='caffe')
+    parser.add_argument('--backend', dest='backend', type=str, help='caffe or pytorch', default='pytorch')
     parser.add_argument('--pytorch_maskcent', dest='pytorch_maskcent', help='need to center mask (activate for siggraph_pretrained but not for converted caffemodel)', action='store_true')
 
     # ***** DEPRECATED *****
@@ -77,7 +78,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = gui_design.GUIDesign(color_model=colorModel, dist_model=distModel,
                                   img_file=args.image_file, load_size=args.load_size, win_size=args.win_size)
-    app.setStyleSheet(qdarkstyle.load_stylesheet(pyside=False))  # comment this if you do not like dark stylesheet
+    #app.setStyleSheet(qdarkstyle.load_stylesheet(pyside=False))  # comment this if you do not like dark stylesheet
     app.setWindowIcon(QIcon('imgs/logo.png'))  # load logo
     window.setWindowTitle('iColor')
     window.setWindowFlags(window.windowFlags() & ~Qt.WindowMaximizeButtonHint)   # fix window siz

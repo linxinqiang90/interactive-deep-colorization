@@ -1,5 +1,7 @@
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+import PyQt5.QtCore as QtCore
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from . import gui_draw
 from . import gui_vis
 from . import gui_gamut
@@ -80,24 +82,30 @@ class GUIDesign(QWidget):
         self.visWidget.update()
         self.colorPush.clicked.connect(self.drawWidget.change_color)
         # color indicator
-        self.connect(self.drawWidget, SIGNAL('update_color'), self.colorPush.setStyleSheet)
+        self.drawWidget.update_color.connect(self.colorPush.setStyleSheet)
         # update result
-        self.connect(self.drawWidget, SIGNAL('update_result'), self.visWidget.update_result)
-        self.connect(self.visWidget, SIGNAL('update_color'), self.gamutWidget.set_ab)
-        self.connect(self.visWidget, SIGNAL('update_color'), self.drawWidget.set_color)
+        self.drawWidget.update_result.connect(self.visWidget.update_result)
+        # so with the above code, when drawWidget is updated, we want visWidget to update its result
+        # visWidget's update_result is just a function that repaints the visWidget.
+        # but below, we also want to whenever visWidget gets updated, get gamutWidget to do set_ab. 
+        self.drawWidget.update_result.connect(self.gamutWidget.set_ab)
+        # self.visWidget.boom.connect(self.gamutWidget.set_ab)
+        #self.drawWidget.update_result.connect(self.drawWidget.set_color)
+        self.visWidget.update_color.connect(self.colorPush.setStyleSheet)
+        # self.visWidget.update_color.connect(self.drawWidget.set_color)
         # update gamut
-        self.connect(self.drawWidget, SIGNAL('update_gamut'), self.gamutWidget.set_gamut)
-        self.connect(self.drawWidget, SIGNAL('update_ab'), self.gamutWidget.set_ab)
-        self.connect(self.gamutWidget, SIGNAL('update_color'), self.drawWidget.set_color)
+        self.drawWidget.update_gamut.connect(self.gamutWidget.set_gamut)
+        self.drawWidget.update_ab.connect(self.gamutWidget.set_ab)
+        self.gamutWidget.update_color.connect(self.drawWidget.set_color)
         # connect palette
-        self.connect(self.drawWidget, SIGNAL('suggest_colors'), self.customPalette.set_colors)
+        self.drawWidget.suggest_colors.connect(self.customPalette.set_colors)
         # self.connect(self.drawWidget, SIGNAL('change_color_id'), self.customPalette.update_color_id)
-        self.connect(self.customPalette, SIGNAL('update_color'), self.drawWidget.set_color)
-        self.connect(self.customPalette, SIGNAL('update_color'), self.gamutWidget.set_ab)
+        self.customPalette.update_color.connect(self.drawWidget.set_color)
+        self.customPalette.update_color.connect(self.gamutWidget.set_ab)
 
-        self.connect(self.drawWidget, SIGNAL('used_colors'), self.usedPalette.set_colors)
-        self.connect(self.usedPalette, SIGNAL('update_color'), self.drawWidget.set_color)
-        self.connect(self.usedPalette, SIGNAL('update_color'), self.gamutWidget.set_ab)
+        self.drawWidget.used_colors.connect(self.usedPalette.set_colors)
+        self.usedPalette.update_color.connect(self.drawWidget.set_color)
+        self.usedPalette.update_color.connect(self.gamutWidget.set_ab)
         # menu events
         self.bGray.setChecked(True)
         self.bRestart.clicked.connect(self.reset)
