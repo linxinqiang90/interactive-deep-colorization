@@ -12,17 +12,16 @@ from data import colorize_image as CI
 import matplotlib.pyplot as plt
 import numpy as np
 
-get_ipython().run_line_magic('matplotlib', 'inline')
 
 # Choose gpu to run the model on
 gpu_id = 0
 
 # Initialize colorization class
-colorModel = CI.ColorizeImageCaffe(Xd=256)
+colorModel = CI.ColorizeImageTorch(Xd=256)
 
 # Load the model
-colorModel.prep_net(gpu_id,'./models/reference_model/deploy_nodist.prototxt','./models/reference_model/model.caffemodel')
-
+# colorModel.prep_net(gpu_id=None,path='models/pytorch/caffemodel.pth')
+colorModel.prep_net(gpu_id=None,path='models/pytorch/latest_net_G.pth')
 
 # ## Load an image
 
@@ -119,7 +118,7 @@ plt.imshow(np.concatenate((mask_fullres,img_in_fullres,img_out_fullres),axis=1))
 plt.title('Mask of user points / Input grayscale with user points / Output olorization')
 plt.axis('off');
 
-
+plt.show()
 # In[ ]:
 
 
